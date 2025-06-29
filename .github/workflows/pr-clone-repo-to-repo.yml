@@ -1,7 +1,10 @@
-name: Import PR #96 from xyz repo
-
 on:
   workflow_dispatch:
+    inputs:
+      pr_number:
+        description: 'PR number from xyz/repo1'
+        required: true
+        default: '96'
 
 jobs:
   import-pr:
