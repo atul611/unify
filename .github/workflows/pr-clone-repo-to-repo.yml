@@ -28,6 +28,8 @@ jobs:
 
       - name: Clone PR branch from source repo
         run: |
+          echo -e "machine github.com\nlogin x-access-token\npassword ${{ secrets.GH_PAT_SOURCE }}" > ~/.netrc
+      
           git clone https://github.com/unify-apps/deutsche-telekom-env.git source-repo
           cd source-repo
           git fetch origin pull/${{ github.event.inputs.pr_number }}/head:pr-${{ github.event.inputs.pr_number }}
