@@ -1,65 +1,49 @@
-name: Import PR from source repo
+name: Import PR Changes from xyz/repo1
 
 on:
   workflow_dispatch:
     inputs:
       pr_number:
-        description: 'PR number from source repo'
+        description: 'PR number from xyz/repo1'
         required: true
         default: '96'
 
 jobs:
-  import-pr:
+  import-changes:
     runs-on: ubuntu-latest
-    env:
-      GH_PAT_SOURCE: ${{ secrets.GH_PAT_SOURCE }}
-      GH_PAT_DEST: ${{ secrets.GH_PAT_DEST }}
 
     steps:
-      - name: Checkout destination repo
+      - name: Checkout abc/repo2
         uses: actions/checkout@v4
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}
+          token: ${{ secrets.GH_PAT }}
 
-      - name: Configure git credentials for source
+      - name: Fetch PR branch from xyz/repo1
         run: |
-          git config --global credential.helper store
-          echo "https://x-access-token:${GH_PAT_SOURCE}@github.com" > ~/.git-credentials
-
-      - name: Clone PR branch from source repo
-        run: |
-          echo -e "machine github.com\nlogin x-access-token\npassword ${{ secrets.GH_PAT_SOURCE }}" > ~/.netrc
-      
-          git clone https://github.com/unify-apps/deutsche-telekom-env.git source-repo
-          cd source-repo
-          git fetch origin pull/${{ github.event.inputs.pr_number }}/head:pr-${{ github.event.inputs.pr_number }}
-          git checkout pr-${{ github.event.inputs.pr_number }}
+          git clone https://x-access-token:${{ secrets.GH_PAT }}@github.com/xyz/repo1.git temp-repo
+          cd temp-repo
+          gh pr checkout ${{ github.event.inputs.pr_number }}
           cd ..
 
-      - name: Copy code from source PR
+      - name: Copy changes
         run: |
-          rsync -av source-repo/ . --exclude '.git' --exclude '.github'
+          rsync -av --exclude='.git' temp-repo/ ./
 
-      - name: Set up git for destination push
+      - name: Commit and push changes
         run: |
-          git config --global user.name "GitHub Action"
-          git config --global user.email "action@github.com"
+          git config user.name "github-actions"
+          git config user.email "github-actions@github.com"
           git checkout -b import-pr-${{ github.event.inputs.pr_number }}
-
-      - name: Commit and push to destination
-        run: |
           git add .
-          git commit -m "Import changes from PR #${{ github.event.inputs.pr_number }}"
-          git remote set-url origin https://x-access-token:${GH_PAT_DEST}@github.com/unify-apps/deutsche-telekom-env.git
+          git commit -m "Import changes from xyz/repo1 PR #${{ github.event.inputs.pr_number }}"
           git push origin import-pr-${{ github.event.inputs.pr_number }}
 
-      - name: Create PR to main branch
+      - name: Create Pull Request
         uses: peter-evans/create-pull-request@v6
         with:
-          token: ${{ secrets.GH_PAT_DEST }}
-          commit-message: Import PR #${{ github.event.inputs.pr_number }}
-          title: Import PR #${{ github.event.inputs.pr_number }} from source repo
+          token: ${{ secrets.GH_PAT }}
+          commit-message: Import changes from xyz/repo1 PR #${{ github.event.inputs.pr_number }}
+          title: Import PR #${{ github.event.inputs.pr_number }} from xyz/repo1
           body: |
-            This PR imports changes from https://github.com/unify-apps/deutsche-telekom-env/pull/${{ github.event.inputs.pr_number }}
+            This PR imports changes from xyz/repo1 PR #${{ github.event.inputs.pr_number }}.
           base: main
-          branch: import-pr-${{ github.event.inputs.pr_number }}
