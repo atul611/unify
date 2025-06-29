@@ -10,11 +10,11 @@ jobs:
       - name: Checkout destination (abc) repo
         uses: actions/checkout@v4
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}
+          token: ${{ secrets.GH_PAT_DEST }}
 
       - name: Clone source (xyz) repo PR branch
         run: |
-          git clone https://sunil-sirvi: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@github.com/unify-apps/deutsche-telekom-env.git source-repo
+          git clone https://x-access-token:${{ secrets.GH_PAT_SOURCE }}@github.com/unify-apps/deutsche-telekom-env.git source-repo
           cd source-repo
           git fetch origin pull/96/head:pr-96
           git checkout pr-96
@@ -31,12 +31,12 @@ jobs:
           git checkout -b import-pr-96
           git add .
           git commit -m "Import changes from PR #96 of sunil-sirvi repo"
-          git push https://unifyapps-saleem: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@github.com/unify-apps/deutsche-telekom-env.git import-pr-96
+          git push https://x-access-token:${{ secrets.GH_PAT_DEST }}@github.com/unify-apps/deutsche-telekom-env.git import-pr-96
 
       - name: Create PR to main branch
         uses: peter-evans/create-pull-request@v6
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}
+          token: ${{ secrets.GH_PAT_DEST }}
           commit-message: Import PR #96 from sunil-sirvi repo
           title: Import PR #96 from xyz repo
           body: Pulling changes from PR #96 from https://github.com/unify-apps/deutsche-telekom-env (sunil-sirvi)
