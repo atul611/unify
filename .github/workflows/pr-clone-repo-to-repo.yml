@@ -1,49 +1,44 @@
-name: Import PR Changes from xyz/repo1
+name: Import PR #96 from xyz repo
 
 on:
   workflow_dispatch:
-    inputs:
-      pr_number:
-        description: 'PR number from xyz/repo1'
-        required: true
-        default: '96'
 
 jobs:
-  import-changes:
+  import-pr:
     runs-on: ubuntu-latest
-
     steps:
-      - name: Checkout abc/repo2
+      - name: Checkout destination (abc) repo
         uses: actions/checkout@v4
         with:
-          token: ${{ secrets.GH_PAT }}
+          token: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Fetch PR branch from xyz/repo1
+      - name: Clone source (xyz) repo PR branch
         run: |
-          git clone https://x-access-token:${{ secrets.GH_PAT }}@github.com/xyz/repo1.git temp-repo
-          cd temp-repo
-          gh pr checkout ${{ github.event.inputs.pr_number }}
+          git clone https://sunil-sirvi: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@github.com/unify-apps/deutsche-telekom-env.git source-repo
+          cd source-repo
+          git fetch origin pull/96/head:pr-96
+          git checkout pr-96
           cd ..
 
-      - name: Copy changes
+      - name: Copy code from source PR
         run: |
-          rsync -av --exclude='.git' temp-repo/ ./
+          rsync -av source-repo/ . --exclude '.git' --exclude '.github'
 
-      - name: Commit and push changes
+      - name: Commit and push to a new branch
         run: |
-          git config user.name "github-actions"
-          git config user.email "github-actions@github.com"
-          git checkout -b import-pr-${{ github.event.inputs.pr_number }}
+          git config user.name "GitHub Action"
+          git config user.email "action@github.com"
+          git checkout -b import-pr-96
           git add .
-          git commit -m "Import changes from xyz/repo1 PR #${{ github.event.inputs.pr_number }}"
-          git push origin import-pr-${{ github.event.inputs.pr_number }}
+          git commit -m "Import changes from PR #96 of sunil-sirvi repo"
+          git push https://unifyapps-saleem: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@github.com/unify-apps/deutsche-telekom-env.git import-pr-96
 
-      - name: Create Pull Request
+      - name: Create PR to main branch
         uses: peter-evans/create-pull-request@v6
         with:
-          token: ${{ secrets.GH_PAT }}
-          commit-message: Import changes from xyz/repo1 PR #${{ github.event.inputs.pr_number }}
-          title: Import PR #${{ github.event.inputs.pr_number }} from xyz/repo1
-          body: |
-            This PR imports changes from xyz/repo1 PR #${{ github.event.inputs.pr_number }}.
+          token: ${{ secrets.GITHUB_TOKEN }}
+          commit-message: Import PR #96 from sunil-sirvi repo
+          title: Import PR #96 from xyz repo
+          body: Pulling changes from PR #96 from https://github.com/unify-apps/deutsche-telekom-env (sunil-sirvi)
           base: main
+          branch: import-pr-96
