@@ -17,10 +17,13 @@ jobs:
 
       - name: Clone source (xyz) repo PR branch
         run: |
-          git clone https://x-access-token:${{ secrets.GH_PAT_SOURCE }}@github.com/unify-apps/deutsche-telekom-env.git source-repo
+          git config --global credential.helper store
+          echo "https://x-access-token:${{ secrets.GH_PAT_SOURCE }}@github.com" > ~/.git-credentials
+      
+          git clone https://github.com/unify-apps/deutsche-telekom-env.git source-repo
           cd source-repo
-          git fetch origin pull/96/head:pr-96
-          git checkout pr-96
+          git fetch origin pull/${{ github.event.inputs.pr_number }}/head:pr-${{ github.event.inputs.pr_number }}
+          git checkout pr-${{ github.event.inputs.pr_number }}
           cd ..
 
       - name: Copy code from source PR
