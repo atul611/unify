@@ -20,7 +20,7 @@ jobs:
 
       - name: Fetch PR branch from xyz/repo1
         run: |
-          git clone https://x-access-token:${{ secrets.GH_PAT }}@github.com/xyz/repo1.git temp-repo
+          git clone https://unifyapps-saleem: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@github.com/unify-apps/deutsche-telekom-env.git temp-repo
           cd temp-repo
           gh pr checkout ${{ github.event.inputs.pr_number }}
           cd ..
