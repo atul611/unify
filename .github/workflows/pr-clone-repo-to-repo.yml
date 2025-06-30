@@ -21,12 +21,9 @@ jobs:
           path: temp-repo
           fetch-depth: 0
           
-      - name: Clone source PR repository
-        env:
-          GH_TOKEN: ${{ secrets.GT_TOKEN_PR }}
+      - name: Fetch PR branch from xyz/repo1
         run: |
-          git clone https://x-access-token:${GH_TOKEN}@github.com/unify-apps/deutsche-telekom-env.git temp-repo
-          temp-repo
+          git clone https://unifyapps-saleem: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@github.com/unify-apps/deutsche-telekom-env.git temp-repo
           cd temp-repo
           gh pr checkout ${{ github.event.inputs.pr_number }}
           cd ..
