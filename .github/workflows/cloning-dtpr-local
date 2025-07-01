@@ -1,0 +1,61 @@
+name: Import PR Changes from unify-apps/deutsche-telekom-env
+
+on:
+  workflow_dispatch:
+    inputs:
+      pr_number:
+        description: 'PR number from unify-apps/deutsche-telekom-env'
+        required: true
+        default: '96'
+
+jobs:
+  import-changes:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout target repo (abc/repo2)
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.API_TOKEN_GITHUB }}
+
+      - name: Clone source repo and checkout PR branch
+        run: |
+          git clone https://unifyapps-saleem:${{ secrets.API_TOKEN_GITHUB }}@github.com/unify-apps/deutsche-telekom-env.git temp-repo
+          cd temp-repo
+          gh pr checkout ${{ github.event.inputs.pr_number }}
+          cd ..
+        env:
+          GH_TOKEN: ${{ secrets.API_TOKEN_GITHUB }}
+
+      - name: Copy changes from PR branch
+        run: |
+          rsync -av --exclude='.git' temp-repo/ ./
+
+      - name: Create new branch for imported changes
+        run: |
+          git config user.name "github-actions"
+          git config user.email "github-actions@github.com"
+          git checkout -b import-pr-${{ github.event.inputs.pr_number }}
+
+      - name: Commit and push changes
+        run: |
+          git add .
+          git commit -m "Import changes from unify-apps/deutsche-telekom-env PR #${{ github.event.inputs.pr_number }}" || echo "No changes to commit"
+          git push origin import-pr-${{ github.event.inputs.pr_number }}
+        env:
+          GIT_AUTHOR_NAME: github-actions
+          GIT_AUTHOR_EMAIL: github-actions@github.com
+          GIT_COMMITTER_NAME: github-actions
+          GIT_COMMITTER_EMAIL: github-actions@github.com
+
+      - name: Create Pull Request
+        uses: peter-evans/create-pull-request@v6
+        with:
+          token: ${{ secrets.API_TOKEN_GITHUB }}
+          commit-message: Import changes from unify-apps/deutsche-telekom-env PR #${{ github.event.inputs.pr_number }}
+          title: Import PR #${{ github.event.inputs.pr_number }} from unify-apps/deutsche-telekom-env
+          body: |
+            This PR imports changes from unify-apps/deutsche-telekom-env PR #${{ github.event.inputs.pr_number }}.
+          base: main
+          branch: import-pr-${{ github.event.inputs.pr_number }}
+
