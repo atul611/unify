@@ -16,7 +16,7 @@ jobs:
       - name: Checkout target repo (abc/repo2)
         uses: actions/checkout@v4
         with:
-          token: ${{ secrets.API_TOKEN_GITHUB }}
+          token: ${{ secrets.GT_HUB }}
 
       - name: Clone source repo and checkout PR branch
         run: |
