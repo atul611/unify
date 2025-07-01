@@ -16,7 +16,7 @@ jobs:
       - name: Checkout abc/repo2
         uses: actions/checkout@v4
         with:
-          token: ${{ secrets.GH_PAT }}
+          token: ${{ secrets.GT_TOKEN_PR }}
 
       - name: Clone deutsche-telekom repo to atul-local-repo
         run: |
