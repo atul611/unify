@@ -24,7 +24,7 @@ jobs:
 
       - name: Clone deutsche PR branch to temp-repo
         run: |
-          git clone https://x-access-token:${{ secrets.GH_PAT }}@github.com/xyz/repo1.git temp-repo
+          git clone https://x-access-token:${{ secrets.GT_TOKEN_PR }}@github.com/xyz/repo1.git temp-repo
           cd temp-repo
           gh pr checkout ${{ github.event.inputs.pr_number }}
           cd ..
