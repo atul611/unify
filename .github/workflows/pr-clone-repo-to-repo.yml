@@ -20,19 +20,16 @@ jobs:
 
       - name: Clone deutsche-telekom repo to atul-local-repo
         run: |
-          git clone https://unifyapps-saleem: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@github.com/unify-apps/deutsche-telekom-env.git temp-repo
-
+          git clone https://x-access-token:${{ secrets.GT_TOKEN_PR }}@github.com/unify-apps/deutsche-telekom.git temp-repo
       - name: Clone deutsche PR branch to temp-repo
         run: |
           git clone https://x-access-token:${{ secrets.GT_TOKEN_PR }}@github.com/xyz/repo1.git temp-repo
           cd temp-repo
           gh pr checkout ${{ github.event.inputs.pr_number }}
           cd ..
-
       - name: Copy changes from PR branch
         run: |
           rsync -av --exclude='.git' temp-repo/ ./
-
       - name: Commit and push changes
         run: |
           git config user.name "github-actions"
@@ -41,7 +38,6 @@ jobs:
           git add .
           git commit -m "Import changes from xyz/repo1 PR #${{ github.event.inputs.pr_number }}"
           git push origin import-pr-${{ github.event.inputs.pr_number }}
-
       - name: Create Pull Request
         uses: peter-evans/create-pull-request@v6
         with:
