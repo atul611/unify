@@ -13,22 +13,23 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout source repo PR
+      - name: Checkout abc/repo2
         uses: actions/checkout@v4
         with:
-          repository: unify-apps/deutsche-telekom-env
-          token: ${{ secrets.GT_TOKEN_PR }}
-          path: temp-repo
-          fetch-depth: 0
-          
-      - name: Fetch PR branch from xyz/repo1
+          token: ${{ secrets.GH_PAT }}
+
+      - name: Clone deutsche-telekom repo to atul-local-repo
         run: |
-          git clone https://unifyapps-saleem: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@github.com/unify-apps/deutsche-telekom-env.git temp-repo
+          git clone https://x-access-token:${{ secrets.GH_PAT }}@github.com/unify-apps/deutsche-telekom.git atul-local-repo
+
+      - name: Clone deutsche PR branch to temp-repo
+        run: |
+          git clone https://x-access-token:${{ secrets.GH_PAT }}@github.com/xyz/repo1.git temp-repo
           cd temp-repo
           gh pr checkout ${{ github.event.inputs.pr_number }}
           cd ..
 
-      - name: Copy changes
+      - name: Copy changes from PR branch
         run: |
           rsync -av --exclude='.git' temp-repo/ ./
 
