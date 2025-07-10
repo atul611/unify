@@ -20,7 +20,7 @@ jobs:
 
       - name: Clone source repo and checkout PR branch
         run: |
-          git clone https://skimranrehman:${GITHUB_TOKEN}@github.com/unify-apps/deutsche-telekom-env.git temp-repo
+          git clone https://skimranrehman:${DT_GITHUB_TOKEN}@github.com/unify-apps/deutsche-telekom-env.git temp-repo
           cd temp-repo
           gh pr checkout ${{ github.event.inputs.pr_number }}
           cd ..
